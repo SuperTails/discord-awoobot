@@ -2,9 +2,13 @@ import asyncio
 import discord
 import datetime
 import time
+import esix
+import sys
+import subprocess
 from collections import Counter
 from typing import List
 from key import token
+
 
 client = discord.Client(status=discord.Status.dnd)
 
@@ -21,6 +25,16 @@ other_roles = []
 record = Counter()
 last_count = {}
 booted = False
+
+
+def tag_name(name):
+    url = esix.config.BASE_URL + 'tag/index.json?name=' + name
+    result = 0
+    rs = esix.api._fetch_data(url)
+    result += len(rs)
+    for tag_data in rs:
+        return esix.tag.Tag(tag_data=tag_data)
+    return None
 
 
 @client.event
@@ -66,6 +80,13 @@ async def on_message(message: discord.Message):
 				last_count[message.author.id] = message.created_at
 			await message.channel.send(f"Hail Awoobis!")
 
+        if message.content.startswith(f"<@{client.user.id}> search"):
+                name = message.content.split(" ")[2]
+                tag = tag_name(name)
+                if (tag != None):
+                    subprocess.call(["./createtag.sh", sys.argv[1], tag.type_str.upper(), str(tag.count)])
+                    f = open('tag.png', 'r')
+                    await message.channel.send(file=discord.File(f))
 	if message.content == f"<@{client.user.id}> uptime":
 		await message.channel.send(f"**__Uptime:__**\n{time.perf_counter()-start_time:.2f} seconds,\nor {(time.perf_counter()-start_time)/3600:.3f} hours, \nor {(time.perf_counter()-start_time)/86400:.4f} days")
 		return
