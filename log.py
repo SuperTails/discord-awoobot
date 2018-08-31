@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 logfile = "logs/" + time.strftime("%Y-%m-") + "bot.log"
-logfile_encoding = config.logfile_encoding
+logfile_encoding = "UTF-8"
 
 
 def now():
