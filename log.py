@@ -7,7 +7,7 @@ import sys
 from datetime import datetime
 
 
-logfile = "logs/" + time.strftime("%Y-%m-") + config.logfile
+logfile = "logs/" + time.strftime("%Y-%m-") + "bot.log"
 logfile_encoding = config.logfile_encoding
 
 
