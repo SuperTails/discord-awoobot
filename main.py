@@ -2,6 +2,7 @@ import asyncio
 import discord
 import datetime
 import time
+import log
 from collections import Counter
 from typing import List
 from key import token
@@ -32,11 +33,11 @@ async def on_ready():
 		every_msg_ever.extend(await ch.history(limit=None, reverse=True).flatten())
 	every_msg_ever = sorted(every_msg_ever, key=lambda x: x.created_at)
 	i = 0
-	print(f"Now processing {len(every_msg_ever)} messages in the entire server...")
+	log.info(f"Now processing {len(every_msg_ever)} messages in the entire server...")
 	for msg in every_msg_ever:
 		i += 1
 		if i % 5000 == 0:
-			print(f"Processed {i} messages...")
+			log.info(f"Processed {i} messages...")
 		if msg.author.bot:
 			continue
 		if msg.created_at-last_count.get(msg.author.id, datetime.datetime(2015, 5, 15, 0, 0, 0)) > datetime.timedelta(hours=6):
@@ -47,11 +48,23 @@ async def on_ready():
 			continue
 	booted = True
 	await client.change_presence(status=discord.Status.online, activity=discord.Game(name="Hail Awoobis!"))
-	print(f"Logged in as {client.user.name}#{client.user.discriminator} ({client.user.id})")
+	log.info(f"Logged in as {client.user.name}#{client.user.discriminator} ({client.user.id})")
 
 
 @client.event
 async def on_message(message: discord.Message):
+	# just log the message
+	if not message.attachments:  # no attachments
+		try:
+			log.msg(f"[{message.guild.name} - {message.guild.id}] [#{message.channel.name} - {message.channel.id}] [message id: {message.id}] [{message.author.name}#{message.author.discriminator} - {message.author.id}] {message.author.display_name}: {message.system_content}")
+		except AttributeError:
+			log.msg(f"[DM] [message id: {message.id}] [{message.author.name}#{message.author.discriminator} - {message.author.id}] {message.system_content}")
+	else:
+		try:
+			log.msg(f"[{message.guild.name} - {message.guild.id}] [#{message.channel.name} - {message.channel.id}] [message id: {message.id}] [{message.author.name}#{message.author.discriminator} - {message.author.id}] {message.author.display_name}: {message.system_content} {' '.join([x.url for x in message.attachments])}")
+		except AttributeError:
+			log.msg(f"[DM] [message id: {message.id}] [{message.author.name}#{message.author.discriminator} - {message.author.id}] {message.system_content} {' '.join([x.url for x in message.attachments])}")
+
 	global record, last_count
 	if message.author.bot or (not booted):
 		return
