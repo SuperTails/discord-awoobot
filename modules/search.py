@@ -5,23 +5,28 @@ import esix
 
 cmd_name = "search"
 
-client.basic_help(title=cmd_name, desc="finds a post on e621 matching the given tags")
+client.basic_help(title=cmd_name, desc="Finds a post on e621 matching the given ")
 
 detailed_help = {
-	"Usage": f"`{client.default_prefix}{cmd_name} [mention]`",
-	"args": "`tags` - tags to search",
-	"desc": "This command finds a post on e621 matching the given tags",
+	"Usage": f"`{client.default_prefix}{cmd_name} <query>`",
+        "Arguments": "`query` - Query to be searched, e.g. 'rating:safe fox'",
+	"Description": "This command finds a post on e621 matching the given query",
 }
 client.long_help(cmd=cmd_name, mapping=detailed_help)
 
 
-@client.command(trigger=cmd_name,
-				aliases=[])  # aliases is a list of strs of other triggers for the command
+@client.command(trigger=cmd_name)  # aliases is a list of strs of other triggers for the command
 async def search(command: str, message: discord.Message):
-        if command.lower().startswith("search "):
-                tags = command.lower()[7:]
-                post = esix.post.search(tags, 1)[0]
-                await message.channel.send("<" + post.url + ">")
-                await message.channel.send("Tags: " + str(post.tags))
+        query = command.lower()[7:]
+        if query == "":
+                await message.channel.send("No search terms provided")
+                return
+
+
+        results = list(esix.post.search(query, 1))
+        if len(results) == 0:
+                await message.channel.send("No posts found")
         else:
-                await message.channel.send("You must provide some tags to be searched")
+                post = results[0]
+                await message.channel.send(f"<{post.url}>")
+                await message.channel.send(f"Tags: {post.tags}")
