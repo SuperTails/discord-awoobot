@@ -1,5 +1,6 @@
 import datetime
 import discord
+import config
 
 from client import client
 
@@ -9,7 +10,7 @@ async def help_command(command: str, message: discord.Message):
 
 	if command.lower() == "help":
 		# basic help route
-		embed = discord.Embed(title=f"Help for {client.cfg_bot_name}", description=f"For help on a specific command, run `{client.default_prefix}help <command>`", colour=0x06b206)
+		embed = discord.Embed(title=f"Help for {client.bot_name}", description=f"For help on a specific command, run `{config.disp_prefix}help <command>`", colour=0x06b206)
 
 		for cmd, desc in client._basic_help.items():
 			embed = embed.add_field(name=f"{cmd}", value=desc, inline=False)
@@ -33,8 +34,8 @@ async def help_command(command: str, message: discord.Message):
 			embed = discord.Embed(title=f"Help for command `{command.lower()[5:]}`", description=sub_help.get("_description", discord.Embed.Empty), colour=0x06b206)
 			for title, text in sub_help.items():
 				embed = embed.add_field(name=title, value=text, inline=False)
-			if client.cmd_aliases[command.lower()[5:]]:
-				embed = embed.add_field(name="Aliases", value="\n".join(client.cmd_aliases[command.lower()[5:]]))
+			if client.cmd_aliases.get(command.lower()[5:], []):
+				embed = embed.add_field(name="Aliases", value="\n".join(client.cmd_aliases.get(command.lower()[5:], [])))
 			embed = embed.set_footer(text=datetime.datetime.utcnow().__str__())
 			await message.channel.send(embed=embed)
 			client.debug_response_trace(clear=1)

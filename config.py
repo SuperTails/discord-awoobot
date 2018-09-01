@@ -27,12 +27,13 @@ boot_status = "dnd"
 # All the prefixes the bot will use. The first one in this list will be considered the default.
 prefixes = [
 	# It is recommended to put the bot's own user ID here (replace bot_id with its id and uncomment those lines)
-	# "<@bot_id> ",
-	# "<@!bot_id> ",
+	"<@476143089598332929> ",
+	"<@!476143089598332929> ",
 ]
+disp_prefix = "@Awoobot "  # prefix to show in help, if it's a mention
 
 # Enables extra checks and more debug info about the bot
 debug = True
 
 # A name for your bot
-bot_name = ""
+bot_name = "Awoobot"

@@ -6,5 +6,12 @@ from key import token
 # from modules import X
 
 from modules import help
+from modules import hail_awoobis_rep
+from modules import markov
+from modules import nou
+from modules import ping
+from modules import pingreact
+from modules import stats
+from modules import uptime
 
 client.run(token)

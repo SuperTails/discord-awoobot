@@ -50,7 +50,7 @@ class FrameworkClient(discord.Client):
 	cmd_aliases: Dict[str, List[str]] = {}
 	alias_lookup: Dict[str, str] = {}
 
-	cfg_bot_name = config.bot_name
+	bot_name = config.bot_name
 
 	prefixes: List[str] = []
 	default_prefix: str = None
@@ -110,7 +110,7 @@ class FrameworkClient(discord.Client):
 	async def on_ready(self):
 		for func in self._ready_handlers:
 			await func()
-		await self.change_presence(activity=discord.Game(name=f"{self.default_prefix}help"), status=discord.Status.online)
+		await self.change_presence(activity=discord.Game(name=f"Hail Awoobis! | {config.disp_prefix}help"), status=discord.Status.online)
 		self.active = True
 		log.info(f"Bot is ready to go! We are @{client.user.name}#{client.user.discriminator} (id: {client.user.id})")
 
@@ -120,6 +120,7 @@ class FrameworkClient(discord.Client):
 
 	async def on_message(self, message: discord.Message):
 		log_message(message)
+		self.message_count += 1
 		if not self.active:
 			return
 		for func in self._message_handlers:
@@ -160,6 +161,8 @@ class FrameworkClient(discord.Client):
 					if not is_us:
 						return
 					else:
+						# we're now guaranteed to run this function, we're home clear now
+						client.command_count += 1
 						client.debug_response_trace(flag=True)
 						try:
 							await func(command=command, message=message)  # PyCharm thinks these are unexpected, but they're not
@@ -176,18 +179,31 @@ class FrameworkClient(discord.Client):
 	def member_join(self, func: Callable[[], None]):
 		self._member_join_handlers.append(func)
 
+	def message(self):
+		def inner(func):
+			async def handleMessage(*args, **kwargs):
+				await func(*args, **kwargs)
+			self._message_handlers.append(handleMessage)
+			return handleMessage
+		return inner
+
 	def member_leave(self, func: Callable[[], None]):
 		self._member_leave_handlers.append(func)
 
-	def ready(self, func: Callable[[], None]):
-		self._ready_handlers.append(func)
+	def ready(self):
+		def inner(func):
+			async def atReady(*args, **kwargs):
+				await func(*args, **kwargs)
+			self._ready_handlers.append(atReady)
+			return atReady
+		return inner
 
 	def shutdown(self, func: Callable[[], None]):
 		self._shutdown_handlers.append(func)
 
 	def basic_help(self, title: str, desc: str, include_prefix: bool = True):
 		if include_prefix:
-			self._basic_help.update({f"{self.default_prefix}{title}": desc})
+			self._basic_help.update({f"{config.disp_prefix}{title}": desc})
 		else:
 			self._basic_help.update({f"{title}": desc})
 
