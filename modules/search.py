@@ -5,7 +5,7 @@ import esix
 
 cmd_name = "search"
 
-client.basic_help(title=cmd_name, desc="Finds a post on e621 matching the given ")
+client.basic_help(title=cmd_name, desc="Finds a post on e621 matching the given search terms")
 
 detailed_help = {
 	"Usage": f"`{client.default_prefix}{cmd_name} <query>`",
