@@ -13,5 +13,6 @@ from modules import ping
 from modules import pingreact
 from modules import stats
 from modules import uptime
+from modules import tag
 
 client.run(token)
