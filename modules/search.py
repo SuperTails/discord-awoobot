@@ -1,6 +1,6 @@
 from client import client
-from modules import _common
 import discord
+import random
 import esix
 
 cmd_name = "search"
@@ -22,10 +22,10 @@ async def search(command: str, message: discord.Message):
 		await message.channel.send("No search terms provided")
 		return
 
-	results = list(esix.post.search(query, 1))
+	results = list(esix.post.search(query, 100))
 	if len(results) == 0:
 		await message.channel.send("No posts found")
 	else:
-		post = results[0]
+		post = random.choice(results)
 		await message.channel.send(f"<{post.url}>")
 		await message.channel.send(f"Tags: {post.tags}")
